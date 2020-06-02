@@ -3,8 +3,8 @@ var bolas;
 const config = {
   type: Phaser.HEADLESS,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: 674,
+  height: 652,
   physics: {
     default: 'arcade',
     arcade: {
@@ -19,16 +19,18 @@ const config = {
   },
   autoFocus: false
 };
-
+//https://www.html5gamedevs.com/topic/2813-attach-sprite-to-sprite/
 function preload() {
   this.load.image('player', 'assets/player.png');
   this.load.image('bola', 'assets/basketball.png');
+  
 }
 
 function create() {
   const self = this;
   this.players = this.physics.add.group();
-  this.bola = this.physics.add.image(randomPosition(700), randomPosition(500), 'bola');
+  this.bola = this.physics.add.image(randomPosition(500), randomPosition(500), 'bola')
+  
   /*this.bolas = this.physics.add.group();
   this.bolas.enableBody = true;
   this.bolas.createMultiple(50, 'bola')
@@ -38,7 +40,7 @@ function create() {
   this.bolas.setAll('anchor.y', 0.5);*/
 
   this.scores = {
-    blue: 0,
+    green: 0,
     red: 0
   };
 
@@ -48,9 +50,9 @@ function create() {
     if (players[player.playerId].team === 'red') {
       self.scores.red += 10;
     } else {
-      self.scores.blue += 10;
+      self.scores.green += 10;
     }
-    self.bola.setPosition(randomPosition(700), randomPosition(500));
+    self.bola.setPosition(randomPosition(500), randomPosition(500));
     io.emit('updateScore', self.scores);
     io.emit('bolaLocation', { x: self.bola.x, y: self.bola.y });
   });
@@ -60,10 +62,10 @@ function create() {
     // create a new player and add it to our players object
     players[socket.id] = {
       rotation: 0,
-      x: Math.floor(Math.random() * 700) + 50,
+      x: Math.floor(Math.random() * 500) + 50,
       y: Math.floor(Math.random() * 500) + 50,
       playerId: socket.id,
-      team: (Math.floor(Math.random() * 2) == 0) ? 'red' : 'blue',
+      team: (Math.floor(Math.random() * 2) == 0) ? 'red' : 'green',
       input: {
         left: false,
         right: false,

@@ -1,8 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: 674,
+  height: 652,
   scene: {
     preload: preload,
     create: create,
@@ -18,6 +18,7 @@ function preload() {
   this.load.image('otherPlayer', 'assets/player.png');
   this.load.image('player', 'assets/player.png');
   this.load.image('bola', 'assets/basketball.png');
+  this.load.image('quadra', 'assets/court.png');
 }
 
 function create() {
@@ -25,8 +26,20 @@ function create() {
   this.socket = io();
   this.players = this.add.group();
 
-  this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
-  this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
+  this.add.image(337, 326, 'quadra');
+  
+  this.greenScoreText = this.add.text(16, 25, '', { fontSize: '32px', fill: '#00FF00' });
+  this.redScoreText = this.add.text(16, 600, '', { fontSize: '32px', fill: '#E06666' });
+
+  // TODO remove
+  /*
+  var sprite0 = self.add.sprite(0, 0, 'bola');
+  var sprite1 = self.add.sprite(-100, -100, 'bola');
+
+  var container = self.add.container(400, 300);
+  container.add(sprite0);
+  container.add(sprite1);
+  // END TODO*/
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
@@ -62,8 +75,8 @@ function create() {
   });
 
   this.socket.on('updateScore', function (scores) {
-    self.blueScoreText.setText('Blue: ' + scores.blue);
-    self.redScoreText.setText('Red: ' + scores.red);
+    self.greenScoreText.setText('green: ' + scores.green);
+    self.redScoreText.setText('red: ' + scores.red);
   });
 
   this.socket.on('bolaLocation', function (bolaLocation) {
@@ -120,7 +133,7 @@ function update() {
 
 function displayPlayers(self, playerInfo, sprite) {
   const player = self.add.sprite(playerInfo.x, playerInfo.y, sprite).setOrigin(0.5, 0.5).setDisplaySize(56, 76);
-  if (playerInfo.team === 'blue') player.setTint(0x3D85C6);
+  if (playerInfo.team === 'green') player.setTint(0x00ff00);
   else player.setTint(0xE06666);
   player.playerId = playerInfo.playerId;
   self.players.add(player);
