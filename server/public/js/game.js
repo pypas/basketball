@@ -10,6 +10,8 @@ var config = {
   }
 };
 
+//https://www.html5gamedevs.com/topic/17808-sprite-picking-up-another-sprite/
+
 document.querySelector('body').style.cursor = 'crosshair'
 
 var game = new Phaser.Game(config);
@@ -27,19 +29,6 @@ function create() {
   this.players = this.add.group();
 
   this.add.image(337, 326, 'quadra');
-  
-  this.greenScoreText = this.add.text(16, 25, '', { fontSize: '32px', fill: '#00FF00' });
-  this.redScoreText = this.add.text(16, 600, '', { fontSize: '32px', fill: '#E06666' });
-
-  // TODO remove
-  /*
-  var sprite0 = self.add.sprite(0, 0, 'bola');
-  var sprite1 = self.add.sprite(-100, -100, 'bola');
-
-  var container = self.add.container(400, 300);
-  container.add(sprite0);
-  container.add(sprite1);
-  // END TODO*/
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
@@ -74,17 +63,18 @@ function create() {
     });
   });
 
-  this.socket.on('updateScore', function (scores) {
-    self.greenScoreText.setText('green: ' + scores.green);
-    self.redScoreText.setText('red: ' + scores.red);
-  });
-
   this.socket.on('bolaLocation', function (bolaLocation) {
     if (!self.bola) {
-      self.bola = self.add.image(bolaLocation.x, bolaLocation.y, 'bola');
+      self.bola = self.add.sprite(bolaLocation.x, bolaLocation.y, 'bola');
+      self.bola.attachedId = null
     } else {
       self.bola.setPosition(bolaLocation.x, bolaLocation.y);
+      self.bola.attachedId = null
     }
+  });
+
+  this.socket.on('bolaAttached', function (playerId) {
+    self.bola.attachedId = playerId
   });
 
   this.cursors = this.input.keyboard.createCursorKeys();
@@ -124,6 +114,10 @@ function update() {
     this.clicked = true
   } else {
     this.clicked = false
+  }
+  if(this.bola && this.bola.attachedId) {
+    let id = this.bola.attachedId
+    this.socket.emit('attachedBall', id)
   }
 
   if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed || down !== this.downKeyPressed || clicked !== this.clicked) {

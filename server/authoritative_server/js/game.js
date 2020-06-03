@@ -1,5 +1,6 @@
 const players = {};
-var bolas;
+var bola;
+var attachedId;
 const config = {
   type: Phaser.HEADLESS,
   parent: 'phaser-example',
@@ -29,33 +30,27 @@ function preload() {
 function create() {
   const self = this;
   this.players = this.physics.add.group();
-  this.bola = this.physics.add.image(randomPosition(500), randomPosition(500), 'bola')
-  
-  /*this.bolas = this.physics.add.group();
-  this.bolas.enableBody = true;
-  this.bolas.createMultiple(50, 'bola')
-  this.bolas.setAll('checkWorldBounds', true);
-  this.bolas.setAll('outOfBoundsKill', true);
-  this.bolas.setAll('anchor.x', 0.5);
-  this.bolas.setAll('anchor.y', 0.5);*/
-
+  this.bola = this.physics.add.image(randomPosition(700), randomPosition(500), 'bola');
   this.scores = {
     green: 0,
     red: 0
   };
+  //container.setSize(128, 64);
+    //  A Container has a default size of 0x0, so we need to give it a size before enabling a physics
+    //  body or it'll be given the default body size of 64x64.
+    /*self.container.setSize(128, 64)
 
-  this.physics.add.collider(this.players);
+    this.physics.world.enable(self.container);
+
+    self.container.body.setVelocity(100, 200).setBounce(1, 1).setCollideWorldBounds(true);;*/
 
   this.physics.add.overlap(this.players, this.bola, function (bola, player) {
-    if (players[player.playerId].team === 'red') {
-      self.scores.red += 10;
-    } else {
-      self.scores.green += 10;
-    }
-    self.bola.setPosition(randomPosition(500), randomPosition(500));
-    io.emit('updateScore', self.scores);
-    io.emit('bolaLocation', { x: self.bola.x, y: self.bola.y });
+    //self.bola.setPosition(randomPosition(700), randomPosition(500));
+    //io.emit('bolaLocation', { x: self.bola.x, y: self.bola.y });
+    io.emit('bolaAttached', player.playerId)
   });
+
+  this.physics.add.collider(this.players);
 
   io.on('connection', function (socket) {
     console.log('a user connected');
@@ -81,8 +76,6 @@ function create() {
     socket.broadcast.emit('newPlayer', players[socket.id]);
     // send the bola object to the new player
     socket.emit('bolaLocation', { x: self.bola.x, y: self.bola.y });
-    // send the current scores
-    socket.emit('updateScore', self.scores);
 
     socket.on('disconnect', function () {
       console.log('user disconnected');
@@ -97,6 +90,11 @@ function create() {
     // when a player moves, update the player data
     socket.on('playerInput', function (inputData) {
       handlePlayerInput(self, socket.id, inputData);
+    });
+
+    // when a player moves, update the player data
+    socket.on('attachedBall', function (inputData) {
+      handleAttachedBall(self, socket.id, inputData);
     });
   });
 }
@@ -137,6 +135,7 @@ function update() {
   });
   this.physics.world.wrap(this.players, 5);
   io.emit('playerUpdates', players);
+  if(this.attached) io.emit('bolaLocation', {x : players[this.attached].x, y: players[this.attached].y + 20})
 }
 
 function randomPosition(max) {
@@ -149,6 +148,10 @@ function handlePlayerInput(self, playerId, input) {
       players[player.playerId].input = input;
     }
   });
+}
+
+function handleAttachedBall(self, playerId, input) {
+  self.attached = input
 }
 
 function addPlayer(self, playerInfo) {
