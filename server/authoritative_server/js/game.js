@@ -37,6 +37,7 @@ function create() {
   };
 
   this.physics.add.overlap(this.players, this.ball, function (ball, player) {
+    io.emit('updateCurrentPlayer', players[player.playerId].name)
     attachedId = player.playerId
   });
 
@@ -50,7 +51,8 @@ function create() {
       x: Math.floor(Math.random() * 500) + 50,
       y: Math.floor(Math.random() * 500) + 50,
       playerId: socket.id,
-      team: (Math.floor(Math.random() * 2) == 0) ? 'red' : 'green',
+      name: "player " + Object.keys(players).length,
+      team: (Object.keys(players).length % 2 == 0) ? 'red' : 'green',
       input: {
         left: false,
         right: false,
@@ -136,6 +138,7 @@ function handleClick(self, playerId, input) {
   self.ball.x = input.x
   self.ball.y = input.y
   io.emit('ballLocation', {x : input.x, y: input.y})
+  io.emit('updateCurrentPlayer', '')
   attachedId = null
 } 
 
@@ -149,6 +152,7 @@ function addPlayer(self, playerInfo) {
 }
 
 function removePlayer(self, playerId) {
+  if(attachedId == playerId) attachedId = null
   self.players.getChildren().forEach((player) => {
     if (playerId === player.playerId) {
       player.destroy();

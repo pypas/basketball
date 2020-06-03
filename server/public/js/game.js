@@ -30,6 +30,8 @@ function create() {
 
   this.add.image(337, 326, 'quadra');
 
+  this.blueScoreText = this.add.text(25, 25, '', { fontSize: '32px', fill: '#FFFFFF' });
+
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
@@ -70,6 +72,10 @@ function create() {
     } else {
       self.ball.setPosition(ballLocation.x, ballLocation.y);
     }
+  });
+
+  this.socket.on('updateCurrentPlayer', function (currentPlayer) {
+    self.blueScoreText.setText(currentPlayer);
   });
 
   this.cursors = this.input.keyboard.createCursorKeys();
