@@ -19,7 +19,7 @@ var game = new Phaser.Game(config);
 function preload() {
   this.load.image('otherPlayer', 'assets/player.png');
   this.load.image('player', 'assets/player.png');
-  this.load.image('bola', 'assets/basketball.png');
+  this.load.image('ball', 'assets/basketball.png');
   this.load.image('quadra', 'assets/court.png');
 }
 
@@ -63,18 +63,13 @@ function create() {
     });
   });
 
-  this.socket.on('bolaLocation', function (bolaLocation) {
-    if (!self.bola) {
-      self.bola = self.add.sprite(bolaLocation.x, bolaLocation.y, 'bola');
-      self.bola.attachedId = null
+  this.socket.on('ballLocation', function (ballLocation) {
+    if (!self.ball) {
+      self.ball = self.add.sprite(ballLocation.x, ballLocation.y, 'ball');
+      self.ball.attachedId = null
     } else {
-      self.bola.setPosition(bolaLocation.x, bolaLocation.y);
-      self.bola.attachedId = null
+      self.ball.setPosition(ballLocation.x, ballLocation.y);
     }
-  });
-
-  this.socket.on('bolaAttached', function (playerId) {
-    self.bola.attachedId = playerId
   });
 
   this.cursors = this.input.keyboard.createCursorKeys();
@@ -82,7 +77,6 @@ function create() {
   this.rightKeyPressed = false;
   this.upKeyPressed = false;
   this.downKeyPressed = false;
-  this.clicked = false
 }
 
 function update() {
@@ -90,7 +84,6 @@ function update() {
   const right = this.rightKeyPressed;
   const up = this.upKeyPressed;
   const down = this.downKeyPressed;
-  const clicked = this.clicked
 
   if (this.cursors.left.isDown) {
     this.leftKeyPressed = true;
@@ -110,18 +103,15 @@ function update() {
     this.upKeyPressed = false;
   }
 
-  if(this.input.activePointer.isDown) {
-    this.clicked = true
-  } else {
-    this.clicked = false
-  }
-  if(this.bola && this.bola.attachedId) {
-    let id = this.bola.attachedId
-    this.socket.emit('attachedBall', id)
-  }
+  this.input.on('pointerdown', function (pointer) {
+        if (pointer.isDown) {
+            this.socket.emit('clicked', {x: pointer.downX, y: pointer.downY});
+        }
+    }, this);
 
-  if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed || down !== this.downKeyPressed || clicked !== this.clicked) {
-    this.socket.emit('playerInput', { left: this.leftKeyPressed , right: this.rightKeyPressed, up: this.upKeyPressed, down: this.downKeyPressed, clicked: this.clicked });
+
+  if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed || down !== this.downKeyPressed) {
+    this.socket.emit('playerInput', { left: this.leftKeyPressed , right: this.rightKeyPressed, up: this.upKeyPressed, down: this.downKeyPressed });
   }
 }
 

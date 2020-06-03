@@ -1,5 +1,5 @@
 const players = {};
-var bola;
+var ball;
 var attachedId;
 const config = {
   type: Phaser.HEADLESS,
@@ -23,31 +23,21 @@ const config = {
 //https://www.html5gamedevs.com/topic/2813-attach-sprite-to-sprite/
 function preload() {
   this.load.image('player', 'assets/player.png');
-  this.load.image('bola', 'assets/basketball.png');
+  this.load.image('ball', 'assets/basketball.png');
   
 }
 
 function create() {
   const self = this;
   this.players = this.physics.add.group();
-  this.bola = this.physics.add.image(randomPosition(700), randomPosition(500), 'bola');
+  this.ball = this.physics.add.image(randomPosition(700), randomPosition(500), 'ball');
   this.scores = {
     green: 0,
     red: 0
   };
-  //container.setSize(128, 64);
-    //  A Container has a default size of 0x0, so we need to give it a size before enabling a physics
-    //  body or it'll be given the default body size of 64x64.
-    /*self.container.setSize(128, 64)
 
-    this.physics.world.enable(self.container);
-
-    self.container.body.setVelocity(100, 200).setBounce(1, 1).setCollideWorldBounds(true);;*/
-
-  this.physics.add.overlap(this.players, this.bola, function (bola, player) {
-    //self.bola.setPosition(randomPosition(700), randomPosition(500));
-    //io.emit('bolaLocation', { x: self.bola.x, y: self.bola.y });
-    io.emit('bolaAttached', player.playerId)
+  this.physics.add.overlap(this.players, this.ball, function (ball, player) {
+    attachedId = player.playerId
   });
 
   this.physics.add.collider(this.players);
@@ -74,8 +64,8 @@ function create() {
     socket.emit('currentPlayers', players);
     // update all other players of the new player
     socket.broadcast.emit('newPlayer', players[socket.id]);
-    // send the bola object to the new player
-    socket.emit('bolaLocation', { x: self.bola.x, y: self.bola.y });
+    // send the ball object to the new player
+    socket.emit('ballLocation', { x: self.ball.x, y: self.ball.y });
 
     socket.on('disconnect', function () {
       console.log('user disconnected');
@@ -92,9 +82,8 @@ function create() {
       handlePlayerInput(self, socket.id, inputData);
     });
 
-    // when a player moves, update the player data
-    socket.on('attachedBall', function (inputData) {
-      handleAttachedBall(self, socket.id, inputData);
+    socket.on('clicked', function (inputData) {
+      if(attachedId == socket.id) handleClick(self, socket.id, inputData)
     });
   });
 }
@@ -103,30 +92,19 @@ function update() {
   this.players.getChildren().forEach((player) => {
     const input = players[player.playerId].input;
     if (input.left) {
-      player.setAngularVelocity(-300);
+      player.setAngularVelocity(-200);
     } else if (input.right) {
-      player.setAngularVelocity(300);
+      player.setAngularVelocity(200);
     } else {
       player.setAngularVelocity(0);
     }
 
     if (input.up) {
-      this.physics.velocityFromRotation(player.rotation, 200, player.body.velocity);
+      this.physics.velocityFromRotation(player.rotation, 300, player.body.velocity);
     } else if (input.down) {
-      this.physics.velocityFromRotation(player.rotation, -200, player.body.velocity);
+      this.physics.velocityFromRotation(player.rotation, -300, player.body.velocity);
     } else {
       player.body.velocity.set(0);
-    }
-
-    if(input.clicked) {
-      console.log("Clicked")
-      /*self.physics.arcade.moveToPointer(this.bola, 200)
-      if(this.bolas.countDead() > 0) {
-        var bola = this.bolas.getFirstDead()
-        bola.reset(player.x, player.y)
-        this.physics.arcade.moveToPointer(bola, 200)
-        nextFire = this.time.now + 100
-      }*/
     }
 
     players[player.playerId].x = player.x;
@@ -135,7 +113,11 @@ function update() {
   });
   this.physics.world.wrap(this.players, 5);
   io.emit('playerUpdates', players);
-  if(this.attached) io.emit('bolaLocation', {x : players[this.attached].x, y: players[this.attached].y + 20})
+  if(attachedId) {
+    this.ball.x = players[attachedId].x
+    this.ball.y = players[attachedId].y +20
+    io.emit('ballLocation', {x : players[attachedId].x, y: players[attachedId].y + 20})
+  }
 }
 
 function randomPosition(max) {
@@ -150,9 +132,12 @@ function handlePlayerInput(self, playerId, input) {
   });
 }
 
-function handleAttachedBall(self, playerId, input) {
-  self.attached = input
-}
+function handleClick(self, playerId, input) {
+  self.ball.x = input.x
+  self.ball.y = input.y
+  io.emit('ballLocation', {x : input.x, y: input.y})
+  attachedId = null
+} 
 
 function addPlayer(self, playerInfo) {
   const player = self.physics.add.image(playerInfo.x, playerInfo.y, 'player').setOrigin(0.5, 0.5).setDisplaySize(56, 76);
