@@ -85,11 +85,11 @@ function create() {
     socket.on('playerInput', function (inputData) {
       handlePlayerInput(self, socket.id, inputData);
     });
-    /*
+    
     socket.on('clicked', function (inputData) {
       if(attachedId == socket.id) handleClick(self, socket.id, inputData)
     });
-  */
+  
   });
 }
 
@@ -136,14 +136,14 @@ function handlePlayerInput(self, playerId, input) {
     }
   });
 }
-/*
+
 function handleClick(self, playerId, input) {
   self.ball.x = input.x
   self.ball.y = input.y
   io.emit('ballLocation', {x : input.x, y: input.y})
   io.emit('updateCurrentPlayer', '')
   attachedId = null
-} */
+} 
 
 function addPlayer(self, playerInfo) {
   const player = self.physics.add.image(playerInfo.x, playerInfo.y, 'player').setOrigin(0.5, 0.5).setDisplaySize(56, 76);
