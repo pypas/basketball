@@ -24,14 +24,14 @@ function preload() {
   this.load.image('quadra', 'assets/court.png');
 }
 
+var names = {};
+
 function create() {
   var self = this;
   this.socket = io();
   this.players = this.add.group();
 
   this.add.image(337, 326, 'quadra');
-
-  this.blueScoreText = this.add.text(25, 25, '', { fontSize: '32px', fill: '#FFFFFF' });
 
   this.topText= this.add.text(10, 5,'',{ font: "12px Arial", fill: "#FFFFFF" });
 
@@ -52,6 +52,7 @@ function create() {
   this.socket.on('disconnect', function (playerId) {
     self.players.getChildren().forEach(function (player) {
       if (playerId === player.playerId) {
+        names[playerId].destroy()
         player.destroy();
       }
     });
@@ -66,10 +67,23 @@ function create() {
           if(self.ball.attachedId === player.playerId) {
             self.ball.setPosition(players[id].x, players[id].y);  
           }
+
+          if(Object.keys(names).length > 0) {
+            let pid = players[id].playerId
+            let name = names[pid]
+            if(name) {
+              name.setText(players[id].name)
+              name.setPosition(players[id].x - 40, players[id].y + 40)
+            }
+          }
         }
         if(players[id].playerId === self.socket.id) {
           self.topText.setText("Your Name: " + players[id].name);
         }
+
+          //todo: not working
+        /**/
+
       });
     });
   });
@@ -83,9 +97,8 @@ function create() {
     }
   });
 
-  this.socket.on('updateCurrentPlayer', function (player) {
-    self.ball.attachedId = player.id
-    self.blueScoreText.setText(player.name);
+  this.socket.on('updateCurrentPlayer', function (id) {
+    self.ball.attachedId = id
   });
 
   this.cursors = this.input.keyboard.createCursorKeys();
@@ -140,6 +153,9 @@ function displayPlayers(self, playerInfo, sprite) {
   const player = self.add.sprite(playerInfo.x, playerInfo.y, sprite).setOrigin(0.5, 0.5).setDisplaySize(56, 76);
   if (playerInfo.team === 'green') player.setTint(0x00ff00);
   else player.setTint(0xE06666);
+  names[playerInfo.playerId] = self.add.text(0, 0,'',{ font: "20px Arial", fill: "#FFFFFF" });
+  names[playerInfo.playerId].setText(playerInfo.name)
+  names[playerInfo.playerId].setPosition(playerInfo.x - 40, playerInfo.y + 40)
   player.playerId = playerInfo.playerId;
   self.players.add(player);
 }

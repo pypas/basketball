@@ -38,7 +38,7 @@ function create() {
 
   this.physics.add.overlap(this.players, this.ball, function (ball, player) {
     if(!attachedId) {
-      io.emit('updateCurrentPlayer', {id: player.playerId, name: players[player.playerId].name})
+      io.emit('updateCurrentPlayer', player.playerId)
       attachedId = player.playerId
     }
   });
@@ -98,7 +98,7 @@ function create() {
 
     socket.on('nameChanged', function (newName) {
       players[socket.id].name =newName
-      if(attachedId == socket.id) io.emit('updateCurrentPlayer', {id: attachedId, name: newName})
+      if(attachedId == socket.id) io.emit('updateCurrentPlayer', attachedId)
     });
   
   });
@@ -151,7 +151,7 @@ function handleClick(self, playerId, input) {
   self.ball.x = input.x
   self.ball.y = input.y
   io.emit('ballLocation', {x : input.x, y: input.y})
-  io.emit('updateCurrentPlayer', {id: null, name: ''})
+  io.emit('updateCurrentPlayer', null)
   attachedId = null
 } 
 
