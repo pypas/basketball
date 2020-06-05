@@ -48,6 +48,12 @@ function create() {
   io.on('connection', function (socket) {
     console.log('a user connected');
     // create a new player and add it to our players object
+    if (io.engine.clientsCount > 10) {
+      socket.emit('err', { message: 'reach the limit of connections' })
+      socket.disconnect()
+      console.log('user disconnected...')
+      return
+    }
     players[socket.id] = {
       rotation: 0,
       x: Math.floor(Math.random() * 500) + 50,
@@ -61,7 +67,7 @@ function create() {
         up: false,
         down: false
       }
-    };
+    }
     // add player to server
     addPlayer(self, players[socket.id]);
     // send the players object to the new player
@@ -88,6 +94,11 @@ function create() {
     
     socket.on('clicked', function (inputData) {
       if(attachedId == socket.id) handleClick(self, socket.id, inputData)
+    });
+
+    socket.on('nameChanged', function (newName) {
+      players[socket.id].name =newName
+      if(attachedId == socket.id) io.emit('updateCurrentPlayer', {id: attachedId, name: newName})
     });
   
   });

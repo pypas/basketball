@@ -10,7 +10,6 @@ const datauri = new Datauri();
 const DatauriParser = require('datauri/parser');
 const parser = new DatauriParser();
 const { JSDOM } = jsdom;
- 
 app.use(express.static(__dirname + '/public'));
  
 app.get('/', function (req, res) {

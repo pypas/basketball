@@ -10,6 +10,7 @@ var config = {
   }
 };
 
+var playerName = ""
 //https://www.html5gamedevs.com/topic/17808-sprite-picking-up-another-sprite/
 
 document.querySelector('body').style.cursor = 'crosshair'
@@ -31,6 +32,8 @@ function create() {
   this.add.image(337, 326, 'quadra');
 
   this.blueScoreText = this.add.text(25, 25, '', { fontSize: '32px', fill: '#FFFFFF' });
+
+  this.topText= this.add.text(10, 5,'',{ font: "12px Arial", fill: "#FFFFFF" });
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
@@ -63,6 +66,9 @@ function create() {
           if(self.ball.attachedId === player.playerId) {
             self.ball.setPosition(players[id].x, players[id].y);  
           }
+        }
+        if(players[id].playerId === self.socket.id) {
+          self.topText.setText("Your Name: " + players[id].name);
         }
       });
     });
@@ -113,6 +119,12 @@ function update() {
     this.upKeyPressed = false;
   }
 
+  if(playerName !== ""){
+    this.socket.emit('nameChanged', playerName)
+    playerName = ""
+  }
+
+
   this.input.on('pointerdown', function (pointer) {
         if (pointer.isDown) {
             this.socket.emit('clicked', {x: pointer.downX, y: pointer.downY});
@@ -130,4 +142,8 @@ function displayPlayers(self, playerInfo, sprite) {
   else player.setTint(0xE06666);
   player.playerId = playerInfo.playerId;
   self.players.add(player);
+}
+
+function disp_prompt() {
+  playerName = prompt("Please enter your name","")
 }
