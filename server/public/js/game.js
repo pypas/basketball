@@ -78,7 +78,6 @@ function create() {
   });
 
   this.socket.on('updateCurrentPlayer', function (player) {
-    console.log(player.id)
     self.ball.attachedId = player.id
     self.blueScoreText.setText(player.name);
   });
@@ -113,13 +112,12 @@ function update() {
     this.downKeyPressed = false;
     this.upKeyPressed = false;
   }
-/*
+
   this.input.on('pointerdown', function (pointer) {
         if (pointer.isDown) {
             this.socket.emit('clicked', {x: pointer.downX, y: pointer.downY});
         }
     }, this);
-*/
 
   if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed || down !== this.downKeyPressed) {
     this.socket.emit('playerInput', { left: this.leftKeyPressed , right: this.rightKeyPressed, up: this.upKeyPressed, down: this.downKeyPressed });
