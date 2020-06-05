@@ -140,7 +140,7 @@ function handleClick(self, playerId, input) {
   self.ball.x = input.x
   self.ball.y = input.y
   io.emit('ballLocation', {x : input.x, y: input.y})
-  io.emit('updateCurrentPlayer', '')
+  io.emit('updateCurrentPlayer', {id: null, name: ''})
   attachedId = null
 } 
 
