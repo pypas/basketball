@@ -35,12 +35,14 @@ function create() {
     green: 0,
     red: 0
   };
-/*
+
   this.physics.add.overlap(this.players, this.ball, function (ball, player) {
-    io.emit('updateCurrentPlayer', players[player.playerId].name)
-    attachedId = player.playerId
+    if(!attachedId) {
+      io.emit('updateCurrentPlayer', {id: player.playerId, name: players[player.playerId].name})
+      attachedId = player.playerId
+    }
   });
-*/
+
   this.physics.add.collider(this.players);
 
   io.on('connection', function (socket) {
@@ -116,11 +118,11 @@ function update() {
   });
   this.physics.world.wrap(this.players, 5);
   io.emit('playerUpdates', players);
-  /*if(attachedId) {
+  if(attachedId) {
     this.ball.x = players[attachedId].x
     this.ball.y = players[attachedId].y +20
-    io.emit('ballLocation', {x : players[attachedId].x, y: players[attachedId].y + 20})
-  }*/
+    //io.emit('ballLocation', {x : players[attachedId].x, y: players[attachedId].y + 20})
+  }
 }
 
 function randomPosition(max) {

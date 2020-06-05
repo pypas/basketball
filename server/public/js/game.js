@@ -60,6 +60,9 @@ function create() {
         if (players[id].playerId === player.playerId) {
           player.setRotation(players[id].rotation);
           player.setPosition(players[id].x, players[id].y);
+          if(self.ball.attachedId === player.playerId) {
+            self.ball.setPosition(players[id].x, players[id].y);  
+          }
         }
       });
     });
@@ -74,8 +77,10 @@ function create() {
     }
   });
 
-  this.socket.on('updateCurrentPlayer', function (currentPlayer) {
-    self.blueScoreText.setText(currentPlayer);
+  this.socket.on('updateCurrentPlayer', function (player) {
+    console.log(player.id)
+    self.ball.attachedId = player.id
+    self.blueScoreText.setText(player.name);
   });
 
   this.cursors = this.input.keyboard.createCursorKeys();
