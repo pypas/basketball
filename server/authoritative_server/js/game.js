@@ -35,12 +35,12 @@ function create() {
     green: 0,
     red: 0
   };
-
+/*
   this.physics.add.overlap(this.players, this.ball, function (ball, player) {
     io.emit('updateCurrentPlayer', players[player.playerId].name)
     attachedId = player.playerId
   });
-
+*/
   this.physics.add.collider(this.players);
 
   io.on('connection', function (socket) {
@@ -83,10 +83,11 @@ function create() {
     socket.on('playerInput', function (inputData) {
       handlePlayerInput(self, socket.id, inputData);
     });
-
+    /*
     socket.on('clicked', function (inputData) {
       if(attachedId == socket.id) handleClick(self, socket.id, inputData)
     });
+  */
   });
 }
 
@@ -115,11 +116,11 @@ function update() {
   });
   this.physics.world.wrap(this.players, 5);
   io.emit('playerUpdates', players);
-  if(attachedId) {
+  /*if(attachedId) {
     this.ball.x = players[attachedId].x
     this.ball.y = players[attachedId].y +20
     io.emit('ballLocation', {x : players[attachedId].x, y: players[attachedId].y + 20})
-  }
+  }*/
 }
 
 function randomPosition(max) {
@@ -133,14 +134,14 @@ function handlePlayerInput(self, playerId, input) {
     }
   });
 }
-
+/*
 function handleClick(self, playerId, input) {
   self.ball.x = input.x
   self.ball.y = input.y
   io.emit('ballLocation', {x : input.x, y: input.y})
   io.emit('updateCurrentPlayer', '')
   attachedId = null
-} 
+} */
 
 function addPlayer(self, playerInfo) {
   const player = self.physics.add.image(playerInfo.x, playerInfo.y, 'player').setOrigin(0.5, 0.5).setDisplaySize(56, 76);
