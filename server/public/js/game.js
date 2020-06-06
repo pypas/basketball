@@ -1,8 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 674,
-  height: 652,
+  width: 652,
+  height: 674,
   scene: {
     preload: preload,
     create: create,
@@ -31,7 +31,7 @@ function create() {
   this.socket = io();
   this.players = this.add.group();
 
-  this.add.image(337, 326, 'quadra');
+  this.add.image(326,337, 'quadra');
 
   this.topText= this.add.text(10, 5,'',{ font: "12px Arial", fill: "#FFFFFF" });
 
@@ -80,9 +80,6 @@ function create() {
         if(players[id].playerId === self.socket.id) {
           self.topText.setText("Your Name: " + players[id].name);
         }
-
-          //todo: not working
-        /**/
 
       });
     });

@@ -4,8 +4,8 @@ var attachedId;
 const config = {
   type: Phaser.HEADLESS,
   parent: 'phaser-example',
-  width: 674,
-  height: 652,
+  width: 652,
+  height: 674,
   physics: {
     default: 'arcade',
     arcade: {
