@@ -1,3 +1,10 @@
+/*
+TODO
+- Erro da bola (posicao errada quando entra outro jogador)
+- Trava quando passa a bola (sera que tem a ver com o evento de clicked?)
+- Atualizar imagens
+*/
+
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
@@ -11,7 +18,6 @@ var config = {
 };
 
 var playerName = ""
-//https://www.html5gamedevs.com/topic/17808-sprite-picking-up-another-sprite/
 
 document.querySelector('body').style.cursor = 'crosshair'
 
@@ -25,6 +31,7 @@ function preload() {
 }
 
 var names = {};
+var canClick = true;
 
 function create() {
   var self = this;
@@ -134,11 +141,15 @@ function update() {
     playerName = ""
   }
 
-
   this.input.on('pointerdown', function (pointer) {
-        if (pointer.isDown) {
+        if (pointer.isDown && canClick) {
             this.socket.emit('clicked', {x: pointer.downX, y: pointer.downY});
+            canClick = false
         }
+    }, this);
+
+  this.input.on('pointerup', function (pointer) {
+        canClick = true
     }, this);
 
   if (left !== this.leftKeyPressed || right !== this.rightKeyPressed || up !== this.upKeyPressed || down !== this.downKeyPressed) {
