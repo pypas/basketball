@@ -77,6 +77,8 @@ function create() {
     // send the ball object to the new player
     socket.emit('ballLocation', { x: self.ball.x, y: self.ball.y });
 
+    socket.emit('updateCurrentPlayer', attachedId)
+
     socket.on('disconnect', function () {
       console.log('user disconnected');
       // remove player from server

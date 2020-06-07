@@ -1,10 +1,3 @@
-/*
-TODO
-- Erro da bola (posicao errada quando entra outro jogador)
-- Trava quando passa a bola (sera que tem a ver com o evento de clicked?)
-- Atualizar imagens
-*/
-
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
