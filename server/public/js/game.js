@@ -129,7 +129,7 @@ function update() {
     this.upKeyPressed = false;
   }
 
-  if(playerName !== ""){
+  if(playerName && playerName !== ""){
     this.socket.emit('nameChanged', playerName)
     playerName = ""
   }

@@ -109,10 +109,10 @@ function create() {
 function update() {
   this.players.getChildren().forEach((player) => {
     const input = players[player.playerId].input;
-    if (input.left) {
-      player.setAngularVelocity(-200);
+    if (input.left){
+      player.setAngularVelocity(-100);
     } else if (input.right) {
-      player.setAngularVelocity(200);
+      player.setAngularVelocity(100);
     } else {
       player.setAngularVelocity(0);
     }
@@ -133,7 +133,7 @@ function update() {
   io.emit('playerUpdates', players);
   if(attachedId) {
     this.ball.x = players[attachedId].x
-    this.ball.y = players[attachedId].y +20
+    this.ball.y = players[attachedId].y
   }
 }
 
